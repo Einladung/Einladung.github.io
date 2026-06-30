@@ -41,6 +41,7 @@
 
 			.scene {
 				position: relative;
+				z-index: 5;
 				width: min(70vw, 470px);
 				height: min(80vh, 580px);
 			}
@@ -106,6 +107,29 @@
 				}
 			}
 
+			.page-decoration {
+				position: fixed;
+				left: 50%;
+				width: 100vw;
+				max-width: none;
+				height: auto;
+				transform: translateX(-50%);
+				pointer-events: none;
+				user-select: none;
+				-webkit-user-select: none;
+				-webkit-user-drag: none;
+			}
+
+			.page-confetti {
+				top: 1vh;
+				z-index: 1;
+			}
+
+			.page-party-flags {
+				top: 0vh;
+				z-index: 2;
+			}
+
 			.caption {
 				position: absolute;
 				left: 50%;
@@ -128,6 +152,9 @@
 				font-family: "Great Vibes", cursive;
 				font-size: clamp(1.6rem, 3.4vw, 2.7rem);
 				font-weight: 400;
+				color: #fff;
+				text-shadow: 0 0 10px rgba(255, 230, 120, 0.95), 0 0 22px rgba(255, 215, 80, 0.75), 0 0 34px rgba(255, 200, 40, 0.45);
+
 				transform: translateX(-50%) rotate(-4deg);
 				transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
 			}
@@ -147,6 +174,9 @@
 				font-family: "Noto Serif Bengali", serif;
 				font-size: clamp(0.85rem, 1.6vw, 1.2rem);
 				font-weight: 700;
+				color: #fff;
+				text-shadow: 0 0 10px rgba(255, 230, 120, 0.95), 0 0 22px rgba(255, 215, 80, 0.75), 0 0 34px rgba(255, 200, 40, 0.45);
+
 				opacity: 0;
 				transform: translateX(-50%);
 				transition: opacity 420ms ease, transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -213,10 +243,16 @@
 				-webkit-user-drag: none;
 			}
 
+			.envelope-background {
+				position: relative;
+				z-index: 3;
+			}
+
+
 			.envelope-stack img.envelope-flower-left {
 				position: absolute;
-				left: -20%;
-				bottom: -55%;
+				left: -15%;
+				bottom: -35%;
 				width: 50%;
 				height: auto;
 				pointer-events: none;
@@ -227,8 +263,8 @@
 			.envelope-stack img.envelope-flower-right {
 				position: absolute;
 				right: -20%;
-				bottom: -70%;
-				width: 35%;
+				bottom: -50%;
+				width: 50%;
 				height: auto;
 				pointer-events: none;
 				z-index: 8;
@@ -427,12 +463,13 @@
 			<p class="loading-text">Bitte kurz warten.</p>
 		</div>
 
+		<img class="page-decoration page-confetti" src="images/confetti.png" alt="" aria-hidden="true" />
+		<img class="page-decoration page-party-flags" src="images/party_flags.png" alt="" aria-hidden="true" />
+
 		<div class="scene">
-			<p class="caption caption-top" id="topText">Zeit zum Feiern!</p>
-			<p class="caption caption-middle" id="middleText">ICH FEIER GEBURTSTAG!</p>
 
 			<div class="envelope-stack" id="envelope" role="button" tabindex="0" aria-pressed="false" aria-disabled="true" aria-label="Envelope illustration">
-				<img src="images/enevlope_background.png" alt="Envelope background" fetchpriority="high" decoding="async" />
+				<img class="envelope-background" src="images/enevlope_background.png" alt="Envelope background" fetchpriority="high" decoding="async" />
 
 				<div class="envelope-photo-slot">
 					<img class="envelope-photo" src="images/Einladung.svg" alt="Irina Klein" fetchpriority="low" decoding="async" />
@@ -442,8 +479,8 @@
 				<img class="envelope-foreground" src="images/envelope_foreground.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
 				<img class="envelope-stamp" src="images/envelope_stamp.svg" alt="" aria-hidden="true" draggable="false" />
 				<div class="envelope-triangle-shadow" aria-hidden="true"></div>
-				<img class="envelope-flower-left" src="images/flower_buttom_left.png" alt="" aria-hidden="true" />
-				<img class="envelope-flower-right" src="images/flower_buttom_right.png" alt="" aria-hidden="true" />
+				<img class="envelope-flower-left" src="images/party_popper.png" alt="" aria-hidden="true" />
+				<img class="envelope-flower-right" src="images/balloons.svg" alt="" aria-hidden="true" />
 			</div>
 
 			<p class="caption caption-invite" id="inviteText">Merkt euch<br />das Datum!</p>
@@ -455,8 +492,6 @@
 		<script>
 			const envelope = document.getElementById("envelope");
 			const stamp = envelope.querySelector(".envelope-stamp");
-			const topText = document.getElementById("topText");
-			const middleText = document.getElementById("middleText");
 			const bottomText = document.getElementById("bottomText");
 			const loadingScreen = document.getElementById("loadingScreen");
 			const foregroundImage = envelope.querySelector(".envelope-foreground");
@@ -523,8 +558,6 @@
 
 				envelope.classList.add("open");
 				envelope.setAttribute("aria-pressed", "true");
-				topText.textContent = "Save the Date!";
-				middleText.textContent = "ICH FEIER GEBURTSTAG!";
 				bottomText.textContent = "Irina Klein\n31. Oktober 2026";
 
 				window.setTimeout(() => {
