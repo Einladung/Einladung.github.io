@@ -1,0 +1,442 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<meta name="description" content="Save the Date von Irina Klein - 31. Oktober 2026" />
+		<meta property="og:type" content="website" />
+		<meta property="og:title" content="Save the Date - Irina Klein" />
+		<meta property="og:description" content="Klicke auf denn Link um denn Umschlag zu öffnen!" />
+		<meta property="og:url" content="https://einladung.github.io/" />
+		<meta property="og:image" content="https://einladung.github.io/images/envelope_preview.png" />
+		<meta property="og:image:alt" content="Beige envelope illustration" />
+		<meta property="og:image:type" content="image/png" />
+		<link rel="preload" as="image" href="images/envelope_foreground.png" />
+		<link rel="preload" as="image" href="images/envelope_head_texture.png" />
+		<link rel="icon" type="image/png" href="images/icon.png" />
+		<title>Irina Klein</title>
+		<style>
+			@import url("https://fonts.googleapis.com/css2?family=Great+Vibes&display=swap");
+			@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali:wght@400;700&display=swap");
+			@import url("https://fonts.googleapis.com/css2?family=Noto+Serif+Bengali+Condensed:wght@400;700&display=swap");
+
+			html,
+			body {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
+
+			body {
+				display: grid;
+				place-items: center;
+				background-color: #aeaeae;
+				background-image: url("images/background.jpeg");
+				background-size: cover;
+				background-position: center;
+				background-repeat: no-repeat;
+				font-family: "Segoe UI", Tahoma, sans-serif;
+				overflow: hidden;
+			}
+
+			.scene {
+				position: relative;
+				width: min(70vw, 470px);
+				height: min(80vh, 580px);
+			}
+
+			.rotate-warning {
+				display: none;
+				position: fixed;
+				inset: 0;
+				z-index: 30;
+				align-items: center;
+				justify-content: center;
+				padding: 1.5rem;
+				text-align: center;
+				background: rgba(0, 0, 0, 0.58);
+				color: #fff;
+				font-size: 1.05rem;
+				font-weight: 600;
+				letter-spacing: 0.02em;
+			}
+
+			.caption {
+				position: absolute;
+				left: 50%;
+				transform: translateX(-50%);
+				z-index: 8;
+				margin: 0;
+				color: #000000;
+				font-weight: 700;
+				letter-spacing: 0.04em;
+				text-align: center;
+				display: inline-block;
+				white-space: nowrap;
+				pointer-events: none;
+				user-select: none;
+				-webkit-user-select: none;
+			}
+
+			.caption-top {
+				top: 0;
+				font-family: "Great Vibes", cursive;
+				font-size: clamp(1.6rem, 3.4vw, 2.7rem);
+				font-weight: 400;
+				transform: translateX(-50%) rotate(-4deg);
+				transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+			}
+
+			.caption-bottom {
+				bottom: 0;
+				font-family: "Noto Serif Bengali Condensed", "Noto Serif Bengali", serif;
+				font-size: clamp(1.2rem, 2.5vw, 1.7rem);
+				font-weight: 700;
+				white-space: pre;
+				transform: translateX(-50%);
+				transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+			}
+
+			.caption-middle {
+				top: 24%;
+				font-family: "Noto Serif Bengali", serif;
+				font-size: clamp(0.85rem, 1.6vw, 1.2rem);
+				font-weight: 700;
+				opacity: 0;
+				transform: translateX(-50%);
+				transition: opacity 420ms ease, transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+			}
+
+			.caption-invite {
+				top: 43%;
+				font-family: "Great Vibes", cursive;
+				font-size: clamp(1.3rem, 2.8vw, 2.2rem);
+				font-weight: 400;
+				line-height: 1.1;
+				transform: translateX(-50%) rotate(-4deg);
+				opacity: 0;
+				transition: opacity 420ms ease, transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+			}
+
+			.envelope-image {
+				display: block;
+				width: min(80vw, 520px);
+				height: auto;
+				max-height: 80vh;
+				object-fit: contain;
+			}
+
+			.envelope-stack {
+				position: absolute;
+				left: 50%;
+				top: 50%;
+				width: min(70vw, 470px);
+				max-height: 80vh;
+				perspective: 1200px;
+				transform: translate(-50%, -50%);
+				filter: drop-shadow(0 18px 28px rgba(0, 0, 0, 0.22));
+				-webkit-tap-highlight-color: transparent;
+				user-select: none;
+				-webkit-user-select: none;
+				touch-action: manipulation;
+			}
+
+			.envelope-stack,
+			.envelope-stack * {
+				cursor: pointer;
+			}
+
+			.envelope-stack img {
+				display: block;
+				width: 100%;
+				height: auto;
+				user-select: none;
+				-webkit-user-select: none;
+				-webkit-user-drag: none;
+			}
+
+			.envelope-stack img.envelope-flower-left {
+				position: absolute;
+				left: -20%;
+				bottom: -55%;
+				width: 50%;
+				height: auto;
+				pointer-events: none;
+				z-index: 8;
+				filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.2));
+			}
+
+			.envelope-stack img.envelope-flower-right {
+				position: absolute;
+				right: -20%;
+				bottom: -70%;
+				width: 35%;
+				height: auto;
+				pointer-events: none;
+				z-index: 8;
+				filter: drop-shadow(0 10px 16px rgba(0, 0, 0, 0.2));
+			}
+
+			.envelope-triangle {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				clip-path: polygon(0 0, 100% 0, 98% 12%, 50% 72%, 2% 12%);
+				background-color: #dedcd7;
+				background-image: url("images/envelope_head_texture.png");
+				background-repeat: no-repeat;
+				background-size: 100% 100%;
+				background-position: top left;
+				filter: none;
+				pointer-events: none;
+				z-index: 8;
+				transform-origin: top center;
+				transform-style: preserve-3d;
+				backface-visibility: visible;
+				transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1);
+			}
+
+			.envelope-stack.open .envelope-triangle {
+				z-index: 4;
+				transform: rotateX(-180deg);
+				filter: none;
+			}
+
+			.envelope-foreground {
+				position: absolute;
+				inset: 0;
+				pointer-events: none;
+				z-index: 6;
+			}
+
+			.envelope-stack img.envelope-stamp {
+				position: absolute;
+				left: 50%;
+				top: 61%;
+				width: 19%;
+				height: auto;
+				transform: translate(-50%, -50%);
+				pointer-events: auto;
+				z-index: 9;
+				transition: opacity 180ms ease;
+			}
+
+			.envelope-stack.open .envelope-stamp {
+				opacity: 0;
+			}
+
+			.envelope-triangle-shadow {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: 100%;
+				height: 100%;
+				clip-path: polygon(0 0, 100% 0, 98% 12%, 50% 72%, 2% 12%);
+				background: linear-gradient(90deg, rgba(0, 0, 0, 0.04) 0%, rgba(0, 0, 0, 0.05) 14%, rgba(0, 0, 0, 0.05) 38%, rgba(0, 0, 0, 0.12) 64%, rgba(0, 0, 0, 0.2) 100%), linear-gradient(180deg, rgba(0, 0, 0, 0.03) 0%, rgba(0, 0, 0, 0.05) 34%, rgba(0, 0, 0, 0.08) 100%);
+				opacity: 0.54;
+				filter: blur(1px);
+				pointer-events: none;
+				z-index: 7;
+				transform: translate(0.1px, 2px);
+				transition: none;
+			}
+
+			.envelope-stack.open .envelope-triangle-shadow {
+				opacity: 0;
+			}
+
+			.envelope-stack .envelope-photo {
+				position: absolute;
+				left: 50%;
+				top: 54%;
+				width: 58%;
+				height: auto;
+				opacity: 0;
+				transform: translate(-50%, -50%);
+				transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease;
+				object-fit: contain;
+				pointer-events: none;
+				z-index: 2;
+			}
+
+			.envelope-stack.shell-ready .envelope-photo {
+				opacity: 1;
+			}
+
+			.envelope-stack.open .envelope-photo {
+				transform: translate(-50%, -112%);
+				transition-duration: 650ms;
+				z-index: 5;
+			}
+
+			.scene:has(.envelope-stack.open) .caption-top {
+				transform: translateX(-50%) translateY(-10rem) rotate(-4deg);
+			}
+
+			.scene:has(.envelope-stack.open) .caption-middle {
+				opacity: 1;
+				transform: translateX(-50%) translateY(-15rem);
+			}
+
+			.scene:has(.envelope-stack.open) .caption-invite {
+				opacity: 1;
+				transform: translateX(-50%) rotate(-4deg);
+				top: 82%;
+			}
+
+			.scene:has(.envelope-stack.open) .caption-bottom {
+				transform: translateX(-50%) translateY(3.8rem);
+			}
+
+			.envelope-stack:focus-visible {
+				outline: 3px solid #b9a57e;
+				outline-offset: 10px;
+			}
+
+			@media (max-width: 768px) {
+				.caption-top {
+					top: 10%;
+					font-size: clamp(1.4rem, 5.4vw, 2.2rem);
+				}
+
+				.caption-middle {
+					top: 16%;
+					font-size: clamp(0.78rem, 3vw, 1.05rem);
+				}
+
+				.caption-invite {
+					font-size: clamp(1.15rem, 4.6vw, 1.8rem);
+					top: 78%;
+				}
+
+				.caption-bottom {
+					font-size: clamp(0.9rem, 3.6vw, 1.25rem);
+					bottom: 15%;
+				}
+
+				.scene:has(.envelope-stack.open) .caption-top {
+					transform: translateX(-50%) translateY(-4.2rem) rotate(-4deg);
+				}
+
+				.scene:has(.envelope-stack.open) .caption-middle {
+					transform: translateX(-50%) translateY(-4rem);
+				}
+
+				.scene:has(.envelope-stack.open) .caption-invite {
+					top: 72%;
+				}
+
+				.scene:has(.envelope-stack.open) .caption-bottom {
+					transform: translateX(-50%) translateY(2.4rem);
+				}
+			}
+
+			@media (max-width: 900px) and (orientation: landscape) {
+				.scene {
+					visibility: hidden;
+					pointer-events: none;
+				}
+
+				.rotate-warning {
+					display: flex;
+				}
+			}
+		</style>
+	</head>
+	<body>
+			<div class="scene">
+				<p class="caption caption-top" id="topText">Zeit zum Feiern!</p>
+				<p class="caption caption-middle" id="middleText">ICH FEIER GEBURTSTAG!</p>
+				<div class="envelope-stack" id="envelope" role="button" tabindex="0" aria-pressed="false" aria-label="Envelope illustration">
+					<img src="images/enevlope_background.png" alt="Envelope background" fetchpriority="high" decoding="async" />
+					<img class="envelope-photo" src="images/Einladung.svg" alt="Irina Klein" fetchpriority="low" decoding="async" />
+					<div class="envelope-triangle" aria-hidden="true"></div>
+					<img class="envelope-foreground" src="images/envelope_foreground.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+					<img class="envelope-stamp" src="images/envelope_stamp.svg" alt="" aria-hidden="true" draggable="false" />
+					<div class="envelope-triangle-shadow" aria-hidden="true"></div>
+					<img class="envelope-flower-left" src="images/flower_buttom_left.png" alt="" aria-hidden="true" />
+					<img class="envelope-flower-right" src="images/flower_buttom_right.png" alt="" aria-hidden="true" />
+				</div>
+				<p class="caption caption-invite" id="inviteText">Merkt euch<br />das Datum!</p>
+				<p class="caption caption-bottom" id="bottomText">DRÜCKE AUF DEN UMSCHLAG...</p>
+			</div>
+			<div class="rotate-warning" aria-live="polite">Bitte drehe dein Handy zurueck ins Hochformat.</div>
+
+				<script>
+					const envelope = document.getElementById("envelope");
+					const stamp = envelope.querySelector(".envelope-stamp");
+					const topText = document.getElementById("topText");
+					const middleText = document.getElementById("middleText");
+					const bottomText = document.getElementById("bottomText");
+					const foregroundImage = envelope.querySelector(".envelope-foreground");
+
+					function tryLockPortrait() {
+						if (!screen.orientation || typeof screen.orientation.lock !== "function") {
+							return;
+						}
+
+						screen.orientation.lock("portrait").catch(() => {
+							// Browsers usually block this in normal tabs; fallback is the landscape overlay.
+						});
+					}
+
+					function waitForImage(image) {
+						if (image.complete && image.naturalWidth > 0) {
+							return Promise.resolve();
+						}
+
+						return new Promise((resolve) => {
+							image.addEventListener("load", resolve, { once: true });
+							image.addEventListener("error", resolve, { once: true });
+						});
+					}
+
+					function preloadTexture(src) {
+						return new Promise((resolve) => {
+							const image = new Image();
+							image.addEventListener("load", resolve, { once: true });
+							image.addEventListener("error", resolve, { once: true });
+							image.src = src;
+						});
+					}
+
+					Promise.all([
+						waitForImage(foregroundImage),
+						preloadTexture("images/envelope_head_texture.png"),
+					]).then(() => {
+						envelope.classList.add("shell-ready");
+					});
+
+					tryLockPortrait();
+					window.addEventListener("orientationchange", tryLockPortrait);
+					window.addEventListener("click", tryLockPortrait, { once: true });
+					window.addEventListener("touchstart", tryLockPortrait, { once: true, passive: true });
+
+					function openEnvelope() {
+						if (envelope.classList.contains("open")) {
+							return;
+						}
+
+						envelope.classList.add("open");
+						envelope.setAttribute("aria-pressed", "true");
+						topText.textContent = "Save the Date!";
+						middleText.textContent = "ICH FEIER GEBURTSTAG!";
+						bottomText.textContent = "Irina Klein\n31. Oktober 2026";
+					}
+
+					envelope.addEventListener("click", openEnvelope);
+					stamp.addEventListener("click", (event) => {
+						event.stopPropagation();
+						openEnvelope();
+					});
+					envelope.addEventListener("keydown", (event) => {
+						if (event.key === "Enter" || event.key === " ") {
+							event.preventDefault();
+							openEnvelope();
+						}
+					});
+				</script>
+	</body>
+</html>
