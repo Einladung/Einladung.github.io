@@ -146,6 +146,10 @@
 				cursor: pointer;
 			}
 
+			.envelope-stack.invite-expanded {
+				z-index: 50;
+			}
+
 			.envelope-stack img {
 				display: block;
 				width: 100%;
@@ -247,7 +251,7 @@
 				opacity: 0;
 			}
 
-			.envelope-stack .envelope-photo {
+			.envelope-photo-slot {
 				position: absolute;
 				left: 50%;
 				top: 54%;
@@ -255,20 +259,37 @@
 				height: auto;
 				opacity: 0;
 				transform: translate(-50%, -50%);
-				transition: transform 180ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease;
-				object-fit: contain;
+				transition: transform 650ms cubic-bezier(0.2, 0.8, 0.2, 1), top 650ms cubic-bezier(0.2, 0.8, 0.2, 1), width 650ms cubic-bezier(0.2, 0.8, 0.2, 1), opacity 150ms ease;
 				pointer-events: none;
 				z-index: 2;
 			}
 
-			.envelope-stack.shell-ready .envelope-photo {
+			.envelope-photo {
+				transform: rotate(90deg);
+				transform-origin: center center;
+				transition: transform 1000ms ease-in-out;
+				object-fit: contain;
+			}
+
+			.envelope-stack.shell-ready .envelope-photo-slot {
 				opacity: 1;
 			}
 
-			.envelope-stack.open .envelope-photo {
-				transform: translate(-50%, -112%);
+			.envelope-stack.open .envelope-photo-slot {
+				transform: translate(-50%, -122%);
 				transition-duration: 650ms;
 				z-index: 5;
+			}
+
+			.envelope-stack.open .envelope-photo {
+				transform: rotate(0deg);
+			}
+
+			.envelope-stack.open.invite-expanded .envelope-photo-slot {
+				top: 50%;
+				width: 96%;
+				transform: translate(-50%, -50%);
+				z-index: 40;
 			}
 
 			.scene:has(.envelope-stack.open) .caption-top {
@@ -346,97 +367,110 @@
 		</style>
 	</head>
 	<body>
-			<div class="scene">
-				<p class="caption caption-top" id="topText">Zeit zum Feiern!</p>
-				<p class="caption caption-middle" id="middleText">ICH FEIER GEBURTSTAG!</p>
-				<div class="envelope-stack" id="envelope" role="button" tabindex="0" aria-pressed="false" aria-label="Envelope illustration">
-					<img src="images/enevlope_background.png" alt="Envelope background" fetchpriority="high" decoding="async" />
+		<div class="scene">
+			<p class="caption caption-top" id="topText">Zeit zum Feiern!</p>
+			<p class="caption caption-middle" id="middleText">ICH FEIER GEBURTSTAG!</p>
+
+			<div class="envelope-stack" id="envelope" role="button" tabindex="0" aria-pressed="false" aria-label="Envelope illustration">
+				<img src="images/enevlope_background.png" alt="Envelope background" fetchpriority="high" decoding="async" />
+
+				<div class="envelope-photo-slot">
 					<img class="envelope-photo" src="images/Einladung.svg" alt="Irina Klein" fetchpriority="low" decoding="async" />
-					<div class="envelope-triangle" aria-hidden="true"></div>
-					<img class="envelope-foreground" src="images/envelope_foreground.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
-					<img class="envelope-stamp" src="images/envelope_stamp.svg" alt="" aria-hidden="true" draggable="false" />
-					<div class="envelope-triangle-shadow" aria-hidden="true"></div>
-					<img class="envelope-flower-left" src="images/flower_buttom_left.png" alt="" aria-hidden="true" />
-					<img class="envelope-flower-right" src="images/flower_buttom_right.png" alt="" aria-hidden="true" />
 				</div>
-				<p class="caption caption-invite" id="inviteText">Merkt euch<br />das Datum!</p>
-				<p class="caption caption-bottom" id="bottomText">DRÜCKE AUF DEN UMSCHLAG...</p>
+
+				<div class="envelope-triangle" aria-hidden="true"></div>
+				<img class="envelope-foreground" src="images/envelope_foreground.png" alt="" aria-hidden="true" fetchpriority="high" decoding="async" />
+				<img class="envelope-stamp" src="images/envelope_stamp.svg" alt="" aria-hidden="true" draggable="false" />
+				<div class="envelope-triangle-shadow" aria-hidden="true"></div>
+				<img class="envelope-flower-left" src="images/flower_buttom_left.png" alt="" aria-hidden="true" />
+				<img class="envelope-flower-right" src="images/flower_buttom_right.png" alt="" aria-hidden="true" />
 			</div>
-			<div class="rotate-warning" aria-live="polite">Bitte drehe dein Handy zurueck ins Hochformat.</div>
 
-				<script>
-					const envelope = document.getElementById("envelope");
-					const stamp = envelope.querySelector(".envelope-stamp");
-					const topText = document.getElementById("topText");
-					const middleText = document.getElementById("middleText");
-					const bottomText = document.getElementById("bottomText");
-					const foregroundImage = envelope.querySelector(".envelope-foreground");
+			<p class="caption caption-invite" id="inviteText">Merkt euch<br />das Datum!</p>
+			<p class="caption caption-bottom" id="bottomText">DRÜCKE AUF DEN UMSCHLAG...</p>
+		</div>
 
-					function tryLockPortrait() {
-						if (!screen.orientation || typeof screen.orientation.lock !== "function") {
-							return;
-						}
+		<div class="rotate-warning" aria-live="polite">Bitte drehe dein Handy zurueck ins Hochformat.</div>
 
-						screen.orientation.lock("portrait").catch(() => {
-							// Browsers usually block this in normal tabs; fallback is the landscape overlay.
-						});
-					}
+		<script>
+			const envelope = document.getElementById("envelope");
+			const stamp = envelope.querySelector(".envelope-stamp");
+			const topText = document.getElementById("topText");
+			const middleText = document.getElementById("middleText");
+			const bottomText = document.getElementById("bottomText");
+			const foregroundImage = envelope.querySelector(".envelope-foreground");
 
-					function waitForImage(image) {
-						if (image.complete && image.naturalWidth > 0) {
-							return Promise.resolve();
-						}
+			function tryLockPortrait() {
+				if (!screen.orientation || typeof screen.orientation.lock !== "function") {
+					return;
+				}
 
-						return new Promise((resolve) => {
-							image.addEventListener("load", resolve, { once: true });
-							image.addEventListener("error", resolve, { once: true });
-						});
-					}
+				screen.orientation.lock("portrait").catch(() => {
+					// Browsers usually block this in normal tabs; fallback is the landscape overlay.
+				});
+			}
 
-					function preloadTexture(src) {
-						return new Promise((resolve) => {
-							const image = new Image();
-							image.addEventListener("load", resolve, { once: true });
-							image.addEventListener("error", resolve, { once: true });
-							image.src = src;
-						});
-					}
+			function waitForImage(image) {
+				if (image.complete && image.naturalWidth > 0) {
+					return Promise.resolve();
+				}
 
-					Promise.all([
-						waitForImage(foregroundImage),
-						preloadTexture("images/envelope_head_texture.png"),
-					]).then(() => {
-						envelope.classList.add("shell-ready");
-					});
+				return new Promise((resolve) => {
+					image.addEventListener("load", resolve, { once: true });
+					image.addEventListener("error", resolve, { once: true });
+				});
+			}
 
-					tryLockPortrait();
-					window.addEventListener("orientationchange", tryLockPortrait);
-					window.addEventListener("click", tryLockPortrait, { once: true });
-					window.addEventListener("touchstart", tryLockPortrait, { once: true, passive: true });
+			function preloadTexture(src) {
+				return new Promise((resolve) => {
+					const image = new Image();
+					image.addEventListener("load", resolve, { once: true });
+					image.addEventListener("error", resolve, { once: true });
+					image.src = src;
+				});
+			}
 
-					function openEnvelope() {
-						if (envelope.classList.contains("open")) {
-							return;
-						}
+			Promise.all([
+				waitForImage(foregroundImage),
+				preloadTexture("images/envelope_head_texture.png"),
+			]).then(() => {
+				envelope.classList.add("shell-ready");
+			});
 
-						envelope.classList.add("open");
-						envelope.setAttribute("aria-pressed", "true");
-						topText.textContent = "Save the Date!";
-						middleText.textContent = "ICH FEIER GEBURTSTAG!";
-						bottomText.textContent = "Irina Klein\n31. Oktober 2026";
-					}
+			tryLockPortrait();
+			window.addEventListener("orientationchange", tryLockPortrait);
+			window.addEventListener("click", tryLockPortrait, { once: true });
+			window.addEventListener("touchstart", tryLockPortrait, { once: true, passive: true });
 
-					envelope.addEventListener("click", openEnvelope);
-					stamp.addEventListener("click", (event) => {
-						event.stopPropagation();
-						openEnvelope();
-					});
-					envelope.addEventListener("keydown", (event) => {
-						if (event.key === "Enter" || event.key === " ") {
-							event.preventDefault();
-							openEnvelope();
-						}
-					});
-				</script>
+			function openEnvelope() {
+				if (envelope.classList.contains("open")) {
+					return;
+				}
+
+				envelope.classList.add("open");
+				envelope.setAttribute("aria-pressed", "true");
+				topText.textContent = "Save the Date!";
+				middleText.textContent = "ICH FEIER GEBURTSTAG!";
+				bottomText.textContent = "Irina Klein\n31. Oktober 2026";
+
+				window.setTimeout(() => {
+					envelope.classList.add("invite-expanded");
+				}, 1500);
+			}
+
+			envelope.addEventListener("click", openEnvelope);
+
+			stamp.addEventListener("click", (event) => {
+				event.stopPropagation();
+				openEnvelope();
+			});
+
+			envelope.addEventListener("keydown", (event) => {
+				if (event.key === "Enter" || event.key === " ") {
+					event.preventDefault();
+					openEnvelope();
+				}
+			});
+		</script>
 	</body>
 </html>
