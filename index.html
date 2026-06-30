@@ -61,6 +61,51 @@
 				letter-spacing: 0.02em;
 			}
 
+			.loading-screen {
+				position: fixed;
+				inset: 0;
+				z-index: 100;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 1rem;
+				padding: 2rem;
+				text-align: center;
+				background: rgba(245, 241, 234, 0.94);
+				color: #2c241c;
+				font-family: "Noto Serif Bengali", serif;
+				font-size: 1.05rem;
+				font-weight: 700;
+				letter-spacing: 0.03em;
+				transition: opacity 350ms ease, visibility 350ms ease;
+			}
+
+			.loading-screen.hidden {
+				opacity: 0;
+				visibility: hidden;
+				pointer-events: none;
+			}
+
+			.loading-spinner {
+				width: 42px;
+				height: 42px;
+				border: 4px solid rgba(44, 36, 28, 0.2);
+				border-top-color: rgba(44, 36, 28, 0.78);
+				border-radius: 50%;
+				animation: spin 900ms linear infinite;
+			}
+
+			.loading-text {
+				margin: 0;
+			}
+
+			@keyframes spin {
+				to {
+					transform: rotate(360deg);
+				}
+			}
+
 			.caption {
 				position: absolute;
 				left: 50%;
@@ -144,6 +189,15 @@
 			.envelope-stack,
 			.envelope-stack * {
 				cursor: pointer;
+			}
+
+			.envelope-stack:not(.assets-ready) {
+				pointer-events: none;
+			}
+
+			.envelope-stack:not(.assets-ready),
+			.envelope-stack:not(.assets-ready) * {
+				cursor: wait;
 			}
 
 			.envelope-stack.invite-expanded {
@@ -367,11 +421,17 @@
 		</style>
 	</head>
 	<body>
+		<div class="loading-screen" id="loadingScreen" aria-live="polite" aria-busy="true">
+			<div class="loading-spinner" aria-hidden="true"></div>
+			<p class="loading-text">Einladung wird geladen...</p>
+			<p class="loading-text">Bitte kurz warten.</p>
+		</div>
+
 		<div class="scene">
 			<p class="caption caption-top" id="topText">Zeit zum Feiern!</p>
 			<p class="caption caption-middle" id="middleText">ICH FEIER GEBURTSTAG!</p>
 
-			<div class="envelope-stack" id="envelope" role="button" tabindex="0" aria-pressed="false" aria-label="Envelope illustration">
+			<div class="envelope-stack" id="envelope" role="button" tabindex="0" aria-pressed="false" aria-disabled="true" aria-label="Envelope illustration">
 				<img src="images/enevlope_background.png" alt="Envelope background" fetchpriority="high" decoding="async" />
 
 				<div class="envelope-photo-slot">
@@ -398,6 +458,7 @@
 			const topText = document.getElementById("topText");
 			const middleText = document.getElementById("middleText");
 			const bottomText = document.getElementById("bottomText");
+			const loadingScreen = document.getElementById("loadingScreen");
 			const foregroundImage = envelope.querySelector(".envelope-foreground");
 
 			function tryLockPortrait() {
@@ -430,11 +491,20 @@
 				});
 			}
 
+			const allPageImages = Array.from(document.querySelectorAll("img"));
+			const fontReady = document.fonts ? document.fonts.ready : Promise.resolve();
+
 			Promise.all([
-				waitForImage(foregroundImage),
+				...allPageImages.map(waitForImage),
+				preloadTexture("images/background.jpeg"),
 				preloadTexture("images/envelope_head_texture.png"),
+				fontReady,
 			]).then(() => {
 				envelope.classList.add("shell-ready");
+				envelope.classList.add("assets-ready");
+				envelope.setAttribute("aria-disabled", "false");
+				loadingScreen.classList.add("hidden");
+				loadingScreen.setAttribute("aria-busy", "false");
 			});
 
 			tryLockPortrait();
@@ -443,6 +513,10 @@
 			window.addEventListener("touchstart", tryLockPortrait, { once: true, passive: true });
 
 			function openEnvelope() {
+				if (!envelope.classList.contains("assets-ready")) {
+					return;
+				}
+
 				if (envelope.classList.contains("open")) {
 					return;
 				}
