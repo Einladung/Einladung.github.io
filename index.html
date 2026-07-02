@@ -463,6 +463,8 @@
 			<p class="loading-text">Bitte kurz warten.</p>
 		</div>
 
+		<audio id="backgroundMusic" src="music/birthday-music.mp3" preload="auto" loop></audio>
+
 		<img class="page-decoration page-confetti" src="images/confetti.png" alt="" aria-hidden="true" />
 		<img class="page-decoration page-party-flags" src="images/party_flags.png" alt="" aria-hidden="true" />
 
@@ -472,7 +474,7 @@
 				<img class="envelope-background" src="images/enevlope_background.png" alt="Envelope background" fetchpriority="high" decoding="async" />
 
 				<div class="envelope-photo-slot">
-					<img class="envelope-photo" src="images/Einladung.svg" alt="Irina Klein" fetchpriority="low" decoding="async" />
+					<img class="envelope-photo" src="images/Einladung6.svg" alt="Irina Klein" fetchpriority="low" decoding="async" />
 				</div>
 
 				<div class="envelope-triangle" aria-hidden="true"></div>
@@ -494,6 +496,7 @@
 			const stamp = envelope.querySelector(".envelope-stamp");
 			const bottomText = document.getElementById("bottomText");
 			const loadingScreen = document.getElementById("loadingScreen");
+			const backgroundMusic = document.getElementById("backgroundMusic");
 			const foregroundImage = envelope.querySelector(".envelope-foreground");
 
 			function tryLockPortrait() {
@@ -547,10 +550,26 @@
 			window.addEventListener("click", tryLockPortrait, { once: true });
 			window.addEventListener("touchstart", tryLockPortrait, { once: true, passive: true });
 
+			let musicStarted = false;
+
+			function startMusic() {
+				if (musicStarted) {
+					return;
+				}
+
+				musicStarted = true;
+				backgroundMusic.volume = 0.6;
+				backgroundMusic.play().catch(() => {
+					musicStarted = false;
+				});
+			}
+
 			function openEnvelope() {
 				if (!envelope.classList.contains("assets-ready")) {
 					return;
 				}
+
+				startMusic();
 
 				if (envelope.classList.contains("open")) {
 					return;
